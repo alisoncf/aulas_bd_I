@@ -1,0 +1,250 @@
+create database if not exists biblioteca;
+
+-- Copiando estrutura para tabela biblioteca.autor
+CREATE TABLE IF NOT EXISTS `autor` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(60) NOT NULL,
+  `nacionalidade` varchar(60) DEFAULT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.autoria
+CREATE TABLE IF NOT EXISTS `autoria` (
+  `fkAutor` int(11) NOT NULL,
+  `fkLivro` int(11) NOT NULL,
+  `ordem` int(2) DEFAULT NULL,
+  PRIMARY KEY (`fkAutor`,`fkLivro`),
+  KEY `fkLivro` (`fkLivro`),
+  CONSTRAINT `autoria_ibfk_1` FOREIGN KEY (`fkAutor`) REFERENCES `autor` (`codigo`),
+  CONSTRAINT `autoria_ibfk_2` FOREIGN KEY (`fkLivro`) REFERENCES `livro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.editora
+CREATE TABLE IF NOT EXISTS `editora` (
+  `codEditora` int(11) NOT NULL AUTO_INCREMENT,
+  `nomeEditora` varchar(60) NOT NULL,
+  PRIMARY KEY (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.emprestimo
+CREATE TABLE IF NOT EXISTS `emprestimo` (
+  `numero` int(11) NOT NULL AUTO_INCREMENT,
+  `fkExemplar` int(11) NOT NULL,
+  `fkMembro` int(11) NOT NULL,
+  `data_retirada` date NOT NULL,
+  `data_devolucao` date DEFAULT NULL,
+  PRIMARY KEY (`numero`),
+  KEY `fkExemplar` (`fkExemplar`),
+  KEY `fkMembro` (`fkMembro`),
+  CONSTRAINT `emprestimo_ibfk_1` FOREIGN KEY (`fkExemplar`) REFERENCES `exemplar` (`codigo`),
+  CONSTRAINT `emprestimo_ibfk_2` FOREIGN KEY (`fkMembro`) REFERENCES `membro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.exemplar
+CREATE TABLE IF NOT EXISTS `exemplar` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `fkLivro` int(11) NOT NULL,
+  `disponivel` tinyint(1) NOT NULL DEFAULT 1,
+  `numTombo` varchar(10) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `numTombo` (`numTombo`),
+  KEY `fkLivro` (`fkLivro`),
+  CONSTRAINT `exemplar_ibfk_1` FOREIGN KEY (`fkLivro`) REFERENCES `livro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.livro
+CREATE TABLE IF NOT EXISTS `livro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `ISBN` varchar(12) DEFAULT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `ano` int(4) DEFAULT NULL,
+  `fkEditora` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkEditora` (`fkEditora`),
+  CONSTRAINT `livro_ibfk_1` FOREIGN KEY (`fkEditora`) REFERENCES `editora` (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.livro1
+CREATE TABLE IF NOT EXISTS `livro1` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `ISBN` varchar(12) DEFAULT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `ano` int(4) DEFAULT NULL,
+  `fkEditora` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkEditora` (`fkEditora`),
+  CONSTRAINT `livro1_ibfk_1` FOREIGN KEY (`fkEditora`) REFERENCES `editora` (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.membro
+CREATE TABLE IF NOT EXISTS `membro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `matricula` varchar(20) NOT NULL,
+  `fkTipoMembro` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkTipoMembro` (`fkTipoMembro`),
+  CONSTRAINT `membro_ibfk_1` FOREIGN KEY (`fkTipoMembro`) REFERENCES `tipo_membro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.tipo_membro
+CREATE TABLE IF NOT EXISTS `tipo_membro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(60) NOT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+-- --------------------------------------------------------
+-- Servidor:                     127.0.0.1
+-- Versão do servidor:           11.6.2-MariaDB - mariadb.org binary distribution
+-- OS do Servidor:               Win64
+-- HeidiSQL Versão:              12.8.0.6908
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+-- Copiando estrutura para tabela biblioteca.autor
+CREATE TABLE IF NOT EXISTS `autor` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(60) NOT NULL,
+  `nacionalidade` varchar(60) DEFAULT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.autoria
+CREATE TABLE IF NOT EXISTS `autoria` (
+  `fkAutor` int(11) NOT NULL,
+  `fkLivro` int(11) NOT NULL,
+  `ordem` int(2) DEFAULT NULL,
+  PRIMARY KEY (`fkAutor`,`fkLivro`),
+  KEY `fkLivro` (`fkLivro`),
+  CONSTRAINT `autoria_ibfk_1` FOREIGN KEY (`fkAutor`) REFERENCES `autor` (`codigo`),
+  CONSTRAINT `autoria_ibfk_2` FOREIGN KEY (`fkLivro`) REFERENCES `livro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.editora
+CREATE TABLE IF NOT EXISTS `editora` (
+  `codEditora` int(11) NOT NULL AUTO_INCREMENT,
+  `nomeEditora` varchar(60) NOT NULL,
+  PRIMARY KEY (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.emprestimo
+CREATE TABLE IF NOT EXISTS `emprestimo` (
+  `numero` int(11) NOT NULL AUTO_INCREMENT,
+  `fkExemplar` int(11) NOT NULL,
+  `fkMembro` int(11) NOT NULL,
+  `data_retirada` date NOT NULL,
+  `data_devolucao` date DEFAULT NULL,
+  PRIMARY KEY (`numero`),
+  KEY `fkExemplar` (`fkExemplar`),
+  KEY `fkMembro` (`fkMembro`),
+  CONSTRAINT `emprestimo_ibfk_1` FOREIGN KEY (`fkExemplar`) REFERENCES `exemplar` (`codigo`),
+  CONSTRAINT `emprestimo_ibfk_2` FOREIGN KEY (`fkMembro`) REFERENCES `membro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.exemplar
+CREATE TABLE IF NOT EXISTS `exemplar` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `fkLivro` int(11) NOT NULL,
+  `disponivel` tinyint(1) NOT NULL DEFAULT 1,
+  `numTombo` varchar(10) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `numTombo` (`numTombo`),
+  KEY `fkLivro` (`fkLivro`),
+  CONSTRAINT `exemplar_ibfk_1` FOREIGN KEY (`fkLivro`) REFERENCES `livro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.livro
+CREATE TABLE IF NOT EXISTS `livro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `ISBN` varchar(12) DEFAULT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `ano` int(4) DEFAULT NULL,
+  `fkEditora` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkEditora` (`fkEditora`),
+  CONSTRAINT `livro_ibfk_1` FOREIGN KEY (`fkEditora`) REFERENCES `editora` (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.livro1
+CREATE TABLE IF NOT EXISTS `livro1` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `ISBN` varchar(12) DEFAULT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `ano` int(4) DEFAULT NULL,
+  `fkEditora` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkEditora` (`fkEditora`),
+  CONSTRAINT `livro1_ibfk_1` FOREIGN KEY (`fkEditora`) REFERENCES `editora` (`codEditora`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.membro
+CREATE TABLE IF NOT EXISTS `membro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `matricula` varchar(20) NOT NULL,
+  `fkTipoMembro` int(11) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fkTipoMembro` (`fkTipoMembro`),
+  CONSTRAINT `membro_ibfk_1` FOREIGN KEY (`fkTipoMembro`) REFERENCES `tipo_membro` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+-- Copiando estrutura para tabela biblioteca.tipo_membro
+CREATE TABLE IF NOT EXISTS `tipo_membro` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(60) NOT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Exportação de dados foi desmarcado.
+
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
