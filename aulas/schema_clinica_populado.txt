@@ -1,0 +1,558 @@
+-- ============================================================
+-- BANCO DE DADOS: CLINICA
+-- MariaDB
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1. CRIAÇÃO DO BANCO
+-- --------------------------------------------biblioteca----------------
+
+CREATE DATABASE IF NOT EXISTS clinica
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE clinica;
+
+
+-- ============================================================
+-- 2. EXCLUSÃO DAS TABELAS
+--    (facilita executar o script novamente durante as aulas)
+-- ============================================================
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS Prescricao;
+DROP TABLE IF EXISTS Consulta;
+DROP TABLE IF EXISTS Especializacao;
+DROP TABLE IF EXISTS Paciente;
+DROP TABLE IF EXISTS Especialidade;
+DROP TABLE IF EXISTS Medico;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- ============================================================
+-- 3. CRIAÇÃO DAS TABELAS
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- TABELA: MEDICO
+-- ------------------------------------------------------------
+
+CREATE TABLE Medico (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    CRM CHAR(20) NOT NULL,
+    nome VARCHAR(50) NOT NULL,
+    telefone VARCHAR(20),
+
+    CONSTRAINT pk_medico
+        PRIMARY KEY (codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TABELA: ESPECIALIDADE
+-- ------------------------------------------------------------
+
+CREATE TABLE Especialidade (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    descricao VARCHAR(100) NOT NULL,
+
+    CONSTRAINT pk_especialidade
+        PRIMARY KEY (codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TABELA: ESPECIALIZACAO
+-- Relação entre Médico e Especialidade
+-- ------------------------------------------------------------
+
+CREATE TABLE Especializacao (
+    fkEspecialidade INT NOT NULL,
+    fkMedico INT NOT NULL,
+
+    CONSTRAINT pk_especializacao
+        PRIMARY KEY (fkEspecialidade, fkMedico),
+
+    CONSTRAINT fk_especializacao_especialidade
+        FOREIGN KEY (fkEspecialidade)
+        REFERENCES Especialidade(codigo),
+
+    CONSTRAINT fk_especializacao_medico
+        FOREIGN KEY (fkMedico)
+        REFERENCES Medico(codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TABELA: PACIENTE
+-- ------------------------------------------------------------
+
+CREATE TABLE Paciente (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    cpf VARCHAR(11) NOT NULL,
+    nome VARCHAR(50) NOT NULL,
+    telefone VARCHAR(20),
+    dt_nascimento DATE,
+
+    CONSTRAINT pk_paciente
+        PRIMARY KEY (codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TABELA: CONSULTA
+-- ------------------------------------------------------------
+
+CREATE TABLE Consulta (
+    idConsulta INT NOT NULL AUTO_INCREMENT,
+    fkPaciente INT NOT NULL,
+    fkMedico INT NOT NULL,
+    Data DATETIME NOT NULL,
+    Diagnostico VARCHAR(255),
+
+    CONSTRAINT pk_consulta
+        PRIMARY KEY (idConsulta),
+
+    CONSTRAINT fk_consulta_paciente
+        FOREIGN KEY (fkPaciente)
+        REFERENCES Paciente(codigo),
+
+    CONSTRAINT fk_consulta_medico
+        FOREIGN KEY (fkMedico)
+        REFERENCES Medico(codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TABELA: PRESCRICAO
+-- ------------------------------------------------------------
+
+CREATE TABLE Prescricao (
+    idPrescricao INT NOT NULL AUTO_INCREMENT,
+    nome_medicamento VARCHAR(100) NOT NULL,
+    principio_ativo VARCHAR(100),
+    dosagem VARCHAR(100),
+    fkConsulta INT NOT NULL,
+
+    CONSTRAINT pk_prescricao
+        PRIMARY KEY (idPrescricao),
+
+    CONSTRAINT fk_prescricao_consulta
+        FOREIGN KEY (fkConsulta)
+        REFERENCES Consulta(idConsulta)
+) ENGINE=InnoDB;
+
+
+-- ============================================================
+-- 4. POPULAÇÃO DO BANCO
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- ESPECIALIDADES
+-- ------------------------------------------------------------
+
+INSERT INTO Especialidade (codigo, descricao) VALUES
+(1, 'Cardiologia'),
+(2, 'Dermatologia'),
+(3, 'Pediatria'),
+(4, 'Ortopedia'),
+(5, 'Neurologia'),
+(6, 'Oftalmologia'),
+(7, 'Ginecologia'),
+(8, 'Psiquiatria'),
+(9, 'Clínica Geral'),
+(10, 'Endocrinologia');
+
+
+-- ------------------------------------------------------------
+-- MÉDICOS
+-- ------------------------------------------------------------
+
+INSERT INTO Medico (codigo, CRM, nome, telefone) VALUES
+(1,  'CRM-GO-10101', 'Ana Paula Martins',      '(62) 99901-1001'),
+(2,  'CRM-GO-10102', 'Bruno Henrique Silva',   '(62) 99901-1002'),
+(3,  'CRM-GO-10103', 'Carla Mendes Oliveira',   '(62) 99901-1003'),
+(4,  'CRM-GO-10104', 'Daniel Ferreira Costa',   '(62) 99901-1004'),
+(5,  'CRM-GO-10105', 'Eduardo Alves Rocha',     '(62) 99901-1005'),
+(6,  'CRM-GO-10106', 'Fernanda Souza Lima',     '(62) 99901-1006'),
+(7,  'CRM-GO-10107', 'Gabriel Pereira Santos',  '(62) 99901-1007'),
+(8,  'CRM-GO-10108', 'Helena Martins Castro',   '(62) 99901-1008'),
+(9,  'CRM-GO-10109', 'Igor Rodrigues Almeida',  '(62) 99901-1009'),
+(10, 'CRM-GO-10110', 'Juliana Barbosa Reis',    '(62) 99901-1010'),
+(11, 'CRM-GO-10111', 'Lucas Carvalho Mendes',   '(62) 99901-1011'),
+(12, 'CRM-GO-10112', 'Mariana Gomes Duarte',    '(62) 99901-1012'),
+(13, 'CRM-GO-10113', 'Rafael Martins Lopes',    '(62) 99901-1013'),
+(14, 'CRM-GO-10114', 'Patrícia Fernandes Lima', '(62) 99901-1014'),
+(15, 'CRM-GO-10115', 'Ricardo Nascimento Alves','(62) 99901-1015');
+
+
+-- ------------------------------------------------------------
+-- ESPECIALIZAÇÕES
+-- ------------------------------------------------------------
+
+INSERT INTO Especializacao (fkEspecialidade, fkMedico) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10),
+
+(1, 11),
+(9, 11),
+
+(2, 12),
+(9, 12),
+
+(4, 13),
+(5, 13),
+
+(3, 14),
+(7, 14),
+
+(10, 15),
+(1, 15);
+
+
+-- ------------------------------------------------------------
+-- PACIENTES
+-- ------------------------------------------------------------
+
+INSERT INTO Paciente
+    (codigo, cpf, nome, telefone, dt_nascimento)
+VALUES
+(1,  '11111111101', 'João Pedro Oliveira',      '(62) 98801-0001', '1985-03-12'),
+(2,  '11111111102', 'Maria Clara Santos',       '(62) 98801-0002', '1990-07-25'),
+(3,  '11111111103', 'Carlos Eduardo Lima',      '(62) 98801-0003', '1978-11-03'),
+(4,  '11111111104', 'Fernanda Alves Souza',     '(62) 98801-0004', '1995-02-18'),
+(5,  '11111111105', 'Roberto Martins Costa',    '(62) 98801-0005', '1969-08-21'),
+(6,  '11111111106', 'Juliana Pereira Rocha',    '(62) 98801-0006', '1988-04-30'),
+(7,  '11111111107', 'Marcos Vinícius Silva',    '(62) 98801-0007', '1975-12-10'),
+(8,  '11111111108', 'Camila Rodrigues Lima',    '(62) 98801-0008', '2001-06-14'),
+(9,  '11111111109', 'Paulo Henrique Mendes',     '(62) 98801-0009', '1982-09-05'),
+(10, '11111111110', 'Larissa Gomes Alves',       '(62) 98801-0010', '1998-01-27'),
+(11, '11111111111', 'Antônio Carlos Pereira',    '(62) 98801-0011', '1965-05-19'),
+(12, '11111111112', 'Beatriz Martins Silva',      '(62) 98801-0012', '1993-10-11'),
+(13, '11111111113', 'Ricardo Souza Santos',       '(62) 98801-0013', '1980-03-08'),
+(14, '11111111114', 'Gabriela Oliveira Costa',    '(62) 98801-0014', '2003-07-22'),
+(15, '11111111115', 'Felipe Almeida Rocha',       '(62) 98801-0015', '1991-11-29'),
+(16, '11111111116', 'Sandra Ferreira Lima',        '(62) 98801-0016', '1972-02-06'),
+(17, '11111111117', 'Mateus Barbosa Silva',       '(62) 98801-0017', '1987-06-17'),
+(18, '11111111118', 'Renata Castro Mendes',        '(62) 98801-0018', '1996-09-23'),
+(19, '11111111119', 'José Augusto Pereira',       '(62) 98801-0019', '1968-12-02'),
+(20, '11111111120', 'Amanda Rodrigues Alves',     '(62) 98801-0020', '1994-05-15'),
+(21, '11111111121', 'Luiz Fernando Costa',        '(62) 98801-0021', '1983-08-09'),
+(22, '11111111122', 'Carolina Mendes Souza',      '(62) 98801-0022', '1999-01-13'),
+(23, '11111111123', 'Marcelo Henrique Lima',      '(62) 98801-0023', '1977-04-26'),
+(24, '11111111124', 'Priscila Martins Rocha',     '(62) 98801-0024', '1992-10-07'),
+(25, '11111111125', 'André Luiz Santos',          '(62) 98801-0025', '1986-03-31'),
+(26, '11111111126', 'Natália Ferreira Costa',     '(62) 98801-0026', '2000-06-28'),
+(27, '11111111127', 'Fábio Pereira Alves',        '(62) 98801-0027', '1974-11-16'),
+(28, '11111111128', 'Cristina Barbosa Lima',      '(62) 98801-0028', '1989-02-24'),
+(29, '11111111129', 'Thiago Rodrigues Souza',     '(62) 98801-0029', '1997-08-13'),
+(30, '11111111130', 'Vanessa Gomes Pereira',      '(62) 98801-0030', '1981-12-19');
+
+
+-- ============================================================
+-- CONSULTAS
+-- ============================================================
+
+INSERT INTO Consulta
+    (idConsulta, fkPaciente, fkMedico, Data, Diagnostico)
+VALUES
+
+(1,  1,  1,  '2026-01-05 08:30:00', 'Hipertensão arterial'),
+(2,  2,  2,  '2026-01-05 09:00:00', 'Dermatite alérgica'),
+(3,  3,  3,  '2026-01-06 08:00:00', 'Infecção respiratória'),
+(4,  4,  4,  '2026-01-06 10:30:00', 'Dor lombar'),
+(5,  5,  5,  '2026-01-07 14:00:00', 'Enxaqueca'),
+(6,  6,  6,  '2026-01-07 15:30:00', 'Miopia'),
+(7,  7,  7,  '2026-01-08 08:30:00', 'Avaliação ginecológica'),
+(8,  8,  8,  '2026-01-08 10:00:00', 'Ansiedade'),
+(9,  9,  9,  '2026-01-09 09:00:00', 'Gripe'),
+(10, 10, 10, '2026-01-09 14:30:00', 'Diabetes tipo 2'),
+
+(11, 11, 11, '2026-01-12 08:00:00', 'Hipertensão arterial'),
+(12, 12, 12, '2026-01-12 09:30:00', 'Acne'),
+(13, 13, 13, '2026-01-13 10:00:00', 'Dor no joelho'),
+(14, 14, 14, '2026-01-13 14:00:00', 'Consulta de rotina'),
+(15, 15, 15, '2026-01-14 08:30:00', 'Alteração glicêmica'),
+(16, 16, 1,  '2026-01-14 10:00:00', 'Arritmia cardíaca'),
+(17, 17, 2,  '2026-01-15 09:00:00', 'Psoríase'),
+(18, 18, 3,  '2026-01-15 15:00:00', 'Febre e tosse'),
+(19, 19, 4,  '2026-01-16 08:00:00', 'Artrite'),
+(20, 20, 5,  '2026-01-16 10:30:00', 'Cefaleia'),
+
+(21, 21, 6,  '2026-01-19 09:00:00', 'Conjuntivite'),
+(22, 22, 7,  '2026-01-19 14:00:00', 'Avaliação ginecológica'),
+(23, 23, 8,  '2026-01-20 08:30:00', 'Insônia'),
+(24, 24, 9,  '2026-01-20 10:00:00', 'Resfriado'),
+(25, 25, 10, '2026-01-21 14:30:00', 'Hipotireoidismo'),
+(26, 26, 11, '2026-01-21 16:00:00', 'Hipertensão'),
+(27, 27, 12, '2026-01-22 09:30:00', 'Dermatite'),
+(28, 28, 13, '2026-01-22 14:00:00', 'Dor cervical'),
+(29, 29, 14, '2026-01-23 08:00:00', 'Acompanhamento pediátrico'),
+(30, 30, 15, '2026-01-23 10:30:00', 'Diabetes tipo 2'),
+
+(31, 1,  1,  '2026-02-02 08:30:00', 'Acompanhamento da hipertensão'),
+(32, 2,  2,  '2026-02-02 09:30:00', 'Dermatite alérgica'),
+(33, 3,  3,  '2026-02-03 08:00:00', 'Infecção respiratória'),
+(34, 4,  4,  '2026-02-03 10:00:00', 'Dor lombar'),
+(35, 5,  5,  '2026-02-04 14:00:00', 'Enxaqueca'),
+(36, 6,  6,  '2026-02-04 15:30:00', 'Miopia'),
+(37, 7,  7,  '2026-02-05 08:30:00', 'Avaliação ginecológica'),
+(38, 8,  8,  '2026-02-05 10:00:00', 'Ansiedade'),
+(39, 9,  9,  '2026-02-06 09:00:00', 'Resfriado'),
+(40, 10, 10, '2026-02-06 14:00:00', 'Diabetes tipo 2'),
+
+(41, 11, 11, '2026-02-09 08:00:00', 'Hipertensão arterial'),
+(42, 12, 12, '2026-02-09 09:30:00', 'Acne'),
+(43, 13, 13, '2026-02-10 10:00:00', 'Dor no joelho'),
+(44, 14, 14, '2026-02-10 14:00:00', 'Consulta de rotina'),
+(45, 15, 15, '2026-02-11 08:30:00', 'Alteração glicêmica'),
+(46, 16, 1,  '2026-02-11 10:00:00', 'Arritmia cardíaca'),
+(47, 17, 2,  '2026-02-12 09:00:00', 'Psoríase'),
+(48, 18, 3,  '2026-02-12 15:00:00', 'Infecção respiratória'),
+(49, 19, 4,  '2026-02-13 08:00:00', 'Artrite'),
+(50, 20, 5,  '2026-02-13 10:30:00', 'Cefaleia'),
+
+(51, 21, 6,  '2026-02-16 09:00:00', 'Conjuntivite'),
+(52, 22, 7,  '2026-02-16 14:00:00', 'Avaliação ginecológica'),
+(53, 23, 8,  '2026-02-17 08:30:00', 'Insônia'),
+(54, 24, 9,  '2026-02-17 10:00:00', 'Gripe'),
+(55, 25, 10, '2026-02-18 14:30:00', 'Hipotireoidismo'),
+(56, 26, 11, '2026-02-18 16:00:00', 'Hipertensão'),
+(57, 27, 12, '2026-02-19 09:30:00', 'Dermatite'),
+(58, 28, 13, '2026-02-19 14:00:00', 'Dor cervical'),
+(59, 29, 14, '2026-02-20 08:00:00', 'Acompanhamento pediátrico'),
+(60, 30, 15, '2026-02-20 10:30:00', 'Diabetes tipo 2');
+
+
+-- ============================================================
+-- PRESCRIÇÕES
+-- ============================================================
+
+INSERT INTO Prescricao
+    (idPrescricao, nome_medicamento, principio_ativo, dosagem, fkConsulta)
+VALUES
+
+(1,   'Losartana', 'Losartana potássica', '50 mg', 1),
+(2,   'AAS', 'Ácido acetilsalicílico', '100 mg', 1),
+
+(3,   'Loratadina', 'Loratadina', '10 mg', 2),
+(4,   'Hidrocortisona', 'Hidrocortisona', '10 mg/g', 2),
+
+(5,   'Amoxicilina', 'Amoxicilina', '500 mg', 3),
+(6,   'Paracetamol', 'Paracetamol', '750 mg', 3),
+
+(7,   'Ibuprofeno', 'Ibuprofeno', '600 mg', 4),
+(8,   'Ciclobenzaprina', 'Ciclobenzaprina', '5 mg', 4),
+
+(9,   'Sumatriptana', 'Sumatriptana', '50 mg', 5),
+(10,  'Dipirona', 'Dipirona sódica', '500 mg', 5),
+
+(11,  'Lacrima Plus', 'Carboximetilcelulose', '5 mg/mL', 6),
+(12,  'Colírio Lubrificante', 'Hipromelose', '3 mg/mL', 6),
+
+(13,  'Ácido fólico', 'Ácido fólico', '5 mg', 7),
+(14,  'Ibuprofeno', 'Ibuprofeno', '400 mg', 7),
+
+(15,  'Sertralina', 'Cloridrato de sertralina', '50 mg', 8),
+(16,  'Melatonina', 'Melatonina', '3 mg', 8),
+
+(17,  'Paracetamol', 'Paracetamol', '750 mg', 9),
+(18,  'Dipirona', 'Dipirona sódica', '500 mg', 9),
+
+(19,  'Metformina', 'Cloridrato de metformina', '850 mg', 10),
+(20,  'Gliclazida', 'Gliclazida', '30 mg', 10),
+
+(21,  'Losartana', 'Losartana potássica', '50 mg', 11),
+(22,  'Hidroclorotiazida', 'Hidroclorotiazida', '25 mg', 11),
+
+(23,  'Isotretinoína', 'Isotretinoína', '20 mg', 12),
+(24,  'Adapaleno', 'Adapaleno', '0,1%', 12),
+
+(25,  'Naproxeno', 'Naproxeno', '500 mg', 13),
+(26,  'Diclofenaco', 'Diclofenaco sódico', '50 mg', 13),
+
+(27,  'Vitamina D', 'Colecalciferol', '2000 UI', 14),
+(28,  'Paracetamol', 'Paracetamol', '500 mg', 14),
+
+(29,  'Metformina', 'Cloridrato de metformina', '850 mg', 15),
+(30,  'Levotiroxina', 'Levotiroxina sódica', '50 mcg', 15),
+
+(31,  'Atenolol', 'Atenolol', '50 mg', 16),
+(32,  'Losartana', 'Losartana potássica', '50 mg', 16),
+
+(33,  'Cetoconazol', 'Cetoconazol', '200 mg', 17),
+(34,  'Loratadina', 'Loratadina', '10 mg', 17),
+
+(35,  'Amoxicilina', 'Amoxicilina', '500 mg', 18),
+(36,  'Ibuprofeno', 'Ibuprofeno', '400 mg', 18),
+
+(37,  'Naproxeno', 'Naproxeno', '500 mg', 19),
+(38,  'Omeprazol', 'Omeprazol', '20 mg', 19),
+
+(39,  'Sumatriptana', 'Sumatriptana', '50 mg', 20),
+(40,  'Paracetamol', 'Paracetamol', '750 mg', 20),
+
+(41,  'Colírio Lubrificante', 'Hipromelose', '3 mg/mL', 21),
+(42,  'Moxifloxacino', 'Moxifloxacino', '5 mg/mL', 21),
+
+(43,  'Ácido fólico', 'Ácido fólico', '5 mg', 22),
+(44,  'Paracetamol', 'Paracetamol', '500 mg', 22),
+
+(45,  'Sertralina', 'Cloridrato de sertralina', '50 mg', 23),
+(46,  'Melatonina', 'Melatonina', '3 mg', 23),
+
+(47,  'Paracetamol', 'Paracetamol', '750 mg', 24),
+(48,  'Loratadina', 'Loratadina', '10 mg', 24),
+
+(49,  'Levotiroxina', 'Levotiroxina sódica', '75 mcg', 25),
+(50,  'Vitamina D', 'Colecalciferol', '2000 UI', 25),
+
+(51,  'Losartana', 'Losartana potássica', '50 mg', 26),
+(52,  'AAS', 'Ácido acetilsalicílico', '100 mg', 26),
+
+(53,  'Loratadina', 'Loratadina', '10 mg', 27),
+(54,  'Hidrocortisona', 'Hidrocortisona', '10 mg/g', 27),
+
+(55,  'Diclofenaco', 'Diclofenaco sódico', '50 mg', 28),
+(56,  'Ciclobenzaprina', 'Ciclobenzaprina', '5 mg', 28),
+
+(57,  'Amoxicilina', 'Amoxicilina', '500 mg', 29),
+(58,  'Paracetamol', 'Paracetamol', '500 mg', 29),
+
+(59,  'Metformina', 'Cloridrato de metformina', '850 mg', 30),
+(60,  'Gliclazida', 'Gliclazida', '30 mg', 30),
+
+(61,  'Losartana', 'Losartana potássica', '50 mg', 31),
+(62,  'Hidroclorotiazida', 'Hidroclorotiazida', '25 mg', 31),
+
+(63,  'Loratadina', 'Loratadina', '10 mg', 32),
+(64,  'Hidrocortisona', 'Hidrocortisona', '10 mg/g', 32),
+
+(65,  'Amoxicilina', 'Amoxicilina', '500 mg', 33),
+(66,  'Paracetamol', 'Paracetamol', '750 mg', 33),
+
+(67,  'Ibuprofeno', 'Ibuprofeno', '600 mg', 34),
+(68,  'Ciclobenzaprina', 'Ciclobenzaprina', '5 mg', 34),
+
+(69,  'Sumatriptana', 'Sumatriptana', '50 mg', 35),
+(70,  'Dipirona', 'Dipirona sódica', '500 mg', 35),
+
+(71,  'Lacrima Plus', 'Carboximetilcelulose', '5 mg/mL', 36),
+(72,  'Colírio Lubrificante', 'Hipromelose', '3 mg/mL', 36),
+
+(73,  'Ácido fólico', 'Ácido fólico', '5 mg', 37),
+(74,  'Ibuprofeno', 'Ibuprofeno', '400 mg', 37),
+
+(75,  'Sertralina', 'Cloridrato de sertralina', '50 mg', 38),
+(76,  'Melatonina', 'Melatonina', '3 mg', 38),
+
+(77,  'Paracetamol', 'Paracetamol', '750 mg', 39),
+(78,  'Dipirona', 'Dipirona sódica', '500 mg', 39),
+
+(79,  'Metformina', 'Cloridrato de metformina', '850 mg', 40),
+(80,  'Gliclazida', 'Gliclazida', '30 mg', 40),
+
+(81,  'Losartana', 'Losartana potássica', '50 mg', 41),
+(82,  'Hidroclorotiazida', 'Hidroclorotiazida', '25 mg', 41),
+
+(83,  'Isotretinoína', 'Isotretinoína', '20 mg', 42),
+(84,  'Adapaleno', 'Adapaleno', '0,1%', 42),
+
+(85,  'Naproxeno', 'Naproxeno', '500 mg', 43),
+(86,  'Diclofenaco', 'Diclofenaco sódico', '50 mg', 43),
+
+(87,  'Vitamina D', 'Colecalciferol', '2000 UI', 44),
+(88,  'Paracetamol', 'Paracetamol', '500 mg', 44),
+
+(89,  'Metformina', 'Cloridrato de metformina', '850 mg', 45),
+(90,  'Levotiroxina', 'Levotiroxina sódica', '50 mcg', 45),
+
+(91,  'Atenolol', 'Atenolol', '50 mg', 46),
+(92,  'Losartana', 'Losartana potássica', '50 mg', 46),
+
+(93,  'Cetoconazol', 'Cetoconazol', '200 mg', 47),
+(94,  'Loratadina', 'Loratadina', '10 mg', 47),
+
+(95,  'Amoxicilina', 'Amoxicilina', '500 mg', 48),
+(96,  'Ibuprofeno', 'Ibuprofeno', '400 mg', 48),
+
+(97,  'Naproxeno', 'Naproxeno', '500 mg', 49),
+(98,  'Omeprazol', 'Omeprazol', '20 mg', 49),
+
+(99,  'Sumatriptana', 'Sumatriptana', '50 mg', 50),
+(100, 'Paracetamol', 'Paracetamol', '750 mg', 50),
+
+(101, 'Colírio Lubrificante', 'Hipromelose', '3 mg/mL', 51),
+(102, 'Moxifloxacino', 'Moxifloxacino', '5 mg/mL', 51),
+
+(103, 'Ácido fólico', 'Ácido fólico', '5 mg', 52),
+(104, 'Paracetamol', 'Paracetamol', '500 mg', 52),
+
+(105, 'Sertralina', 'Cloridrato de sertralina', '50 mg', 53),
+(106, 'Melatonina', 'Melatonina', '3 mg', 53),
+
+(107, 'Paracetamol', 'Paracetamol', '750 mg', 54),
+(108, 'Loratadina', 'Loratadina', '10 mg', 54),
+
+(109, 'Levotiroxina', 'Levotiroxina sódica', '75 mcg', 55),
+(110, 'Vitamina D', 'Colecalciferol', '2000 UI', 55),
+
+(111, 'Losartana', 'Losartana potássica', '50 mg', 56),
+(112, 'AAS', 'Ácido acetilsalicílico', '100 mg', 56),
+
+(113, 'Loratadina', 'Loratadina', '10 mg', 57),
+(114, 'Hidrocortisona', 'Hidrocortisona', '10 mg/g', 57),
+
+(115, 'Diclofenaco', 'Diclofenaco sódico', '50 mg', 58),
+(116, 'Ciclobenzaprina', 'Ciclobenzaprina', '5 mg', 58),
+
+(117, 'Amoxicilina', 'Amoxicilina', '500 mg', 59),
+(118, 'Paracetamol', 'Paracetamol', '500 mg', 59),
+
+(119, 'Metformina', 'Cloridrato de metformina', '850 mg', 60),
+(120, 'Gliclazida', 'Gliclazida', '30 mg', 60);
+
+
+-- ============================================================
+-- 5. CONFERÊNCIA
+-- ============================================================
+
+SELECT 'Medico' AS tabela, COUNT(*) AS quantidade
+FROM Medico
+
+UNION ALL
+
+SELECT 'Especialidade', COUNT(*)
+FROM Especialidade
+
+UNION ALL
+
+SELECT 'Especializacao', COUNT(*)
+FROM Especializacao
+
+UNION ALL
+
+SELECT 'Paciente', COUNT(*)
+FROM Paciente
+
+UNION ALL
+
+SELECT 'Consulta', COUNT(*)
+FROM Consulta
+
+UNION ALL
+
+SELECT 'Prescricao', COUNT(*)
+FROM Prescricao;

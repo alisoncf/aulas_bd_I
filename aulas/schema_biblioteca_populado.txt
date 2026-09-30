@@ -1,0 +1,540 @@
+-- ============================================================
+-- BANCO DE DADOS: BIBLIOTECA
+
+-- ============================================================
+
+
+-- ============================================================
+-- 1. CRIAÇÃO DO BANCO
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS biblioteca
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE biblioteca;
+
+
+-- ============================================================
+-- 2. EXCLUSÃO DAS TABELAS
+-- ============================================================
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS emprestimo;
+DROP TABLE IF EXISTS autoria;
+DROP TABLE IF EXISTS exemplar;
+DROP TABLE IF EXISTS membro;
+DROP TABLE IF EXISTS livro;
+DROP TABLE IF EXISTS autor;
+DROP TABLE IF EXISTS editora;
+DROP TABLE IF EXISTS tipo_membro;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- ============================================================
+-- 3. CRIAÇÃO DAS TABELAS
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- AUTOR
+-- ------------------------------------------------------------
+
+CREATE TABLE autor (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(60) NOT NULL,
+    nacionalidade VARCHAR(60),
+
+    CONSTRAINT pk_autor
+        PRIMARY KEY (codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- EDITORA
+-- ------------------------------------------------------------
+
+CREATE TABLE editora (
+    codEditora INT NOT NULL AUTO_INCREMENT,
+    nomeEditora VARCHAR(60) NOT NULL,
+
+    CONSTRAINT pk_editora
+        PRIMARY KEY (codEditora)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- TIPO DE MEMBRO
+-- ------------------------------------------------------------
+
+CREATE TABLE tipo_membro (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    descricao VARCHAR(60) NOT NULL,
+
+    CONSTRAINT pk_tipo_membro
+        PRIMARY KEY (codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- LIVRO
+-- ------------------------------------------------------------
+
+CREATE TABLE livro (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    ISBN VARCHAR(12) NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    ano INT,
+    fkEditora INT NOT NULL,
+
+    CONSTRAINT pk_livro
+        PRIMARY KEY (codigo),
+
+    CONSTRAINT uq_livro_isbn
+        UNIQUE (ISBN),
+
+    CONSTRAINT fk_livro_editora
+        FOREIGN KEY (fkEditora)
+        REFERENCES editora(codEditora)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- EXEMPLAR
+-- ------------------------------------------------------------
+
+CREATE TABLE exemplar (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    fkLivro INT NOT NULL,
+    disponivel TINYINT(1) NOT NULL DEFAULT 1,
+    numTombo VARCHAR(10) NOT NULL,
+
+    CONSTRAINT pk_exemplar
+        PRIMARY KEY (codigo),
+
+    CONSTRAINT uq_exemplar_tombo
+        UNIQUE (numTombo),
+
+    CONSTRAINT fk_exemplar_livro
+        FOREIGN KEY (fkLivro)
+        REFERENCES livro(codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- AUTORIA
+-- Relação N:N entre Autor e Livro
+-- ------------------------------------------------------------
+
+CREATE TABLE autoria (
+    fkAutor INT NOT NULL,
+    fkLivro INT NOT NULL,
+    ordem INT,
+
+    CONSTRAINT pk_autoria
+        PRIMARY KEY (fkAutor, fkLivro),
+
+    CONSTRAINT fk_autoria_autor
+        FOREIGN KEY (fkAutor)
+        REFERENCES autor(codigo),
+
+    CONSTRAINT fk_autoria_livro
+        FOREIGN KEY (fkLivro)
+        REFERENCES livro(codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- MEMBRO
+-- ------------------------------------------------------------
+
+CREATE TABLE membro (
+    codigo INT NOT NULL AUTO_INCREMENT,
+    matricula VARCHAR(20) NOT NULL,
+    fkTipoMembro INT NOT NULL,
+
+    CONSTRAINT pk_membro
+        PRIMARY KEY (codigo),
+
+    CONSTRAINT fk_membro_tipo
+        FOREIGN KEY (fkTipoMembro)
+        REFERENCES tipo_membro(codigo)
+) ENGINE=InnoDB;
+
+
+-- ------------------------------------------------------------
+-- EMPRÉSTIMO
+-- ------------------------------------------------------------
+
+CREATE TABLE emprestimo (
+    numero INT NOT NULL AUTO_INCREMENT,
+    fkExemplar INT NOT NULL,
+    fkMembro INT NOT NULL,
+    data_retirada DATE NOT NULL,
+    data_devolucao DATE,
+
+    CONSTRAINT pk_emprestimo
+        PRIMARY KEY (numero),
+
+    CONSTRAINT fk_emprestimo_exemplar
+        FOREIGN KEY (fkExemplar)
+        REFERENCES exemplar(codigo),
+
+    CONSTRAINT fk_emprestimo_membro
+        FOREIGN KEY (fkMembro)
+        REFERENCES membro(codigo)
+) ENGINE=InnoDB;
+
+
+-- ============================================================
+-- 4. POPULAÇÃO
+-- ============================================================
+
+
+-- ============================================================
+-- AUTORES
+-- ============================================================
+
+INSERT INTO autor (codigo, nome, nacionalidade) VALUES
+(1,  'Machado de Assis',       'Brasileira'),
+(2,  'Clarice Lispector',      'Brasileira'),
+(3,  'Jorge Amado',            'Brasileira'),
+(4,  'Graciliano Ramos',       'Brasileira'),
+(5,  'Carlos Drummond de Andrade', 'Brasileira'),
+(6,  'José Saramago',           'Portuguesa'),
+(7,  'Fernando Pessoa',         'Portuguesa'),
+(8,  'Gabriel García Márquez',  'Colombiana'),
+(9,  'George Orwell',           'Britânica'),
+(10, 'J. K. Rowling',           'Britânica'),
+(11, 'Yuval Noah Harari',       'Israelense'),
+(12, 'Umberto Eco',             'Italiana');
+
+
+-- ============================================================
+-- EDITORAS
+-- ============================================================
+
+INSERT INTO editora (codEditora, nomeEditora) VALUES
+(1, 'Companhia das Letras'),
+(2, 'Record'),
+(3, 'Rocco'),
+(4, 'José Olympio'),
+(5, 'Globo Livros'),
+(6, 'Penguin-Companhia'),
+(7, 'Editora 34'),
+(8, 'Martins Fontes');
+
+
+-- ============================================================
+-- TIPOS DE MEMBRO
+-- ============================================================
+
+INSERT INTO tipo_membro (codigo, descricao) VALUES
+(1, 'Aluno'),
+(2, 'Professor'),
+(3, 'Funcionário'),
+(4, 'Comunidade externa');
+
+
+-- ============================================================
+-- LIVROS
+-- ============================================================
+
+INSERT INTO livro
+    (codigo, ISBN, titulo, ano, fkEditora)
+VALUES
+(1,  '9788535902778', 'Dom Casmurro',                         1899, 1),
+(2,  '9788535911664', 'Memórias Póstumas de Brás Cubas',    1881, 1),
+(3,  '9788535925661', 'Quincas Borba',                       1891, 1),
+(4,  '9788532506031', 'A Hora da Estrela',                   1977, 2),
+(5,  '9788532506048', 'Perto do Coração Selvagem',           1943, 2),
+(6,  '9788532506055', 'Laços de Família',                    1960, 2),
+(7,  '9788535926644', 'Capitães da Areia',                   1937, 1),
+(8,  '9788501061472', 'Gabriela, Cravo e Canela',             1958, 5),
+(9,  '9788501061489', 'Dona Flor e Seus Dois Maridos',        1966, 5),
+(10, '9788520925531', 'Vidas Secas',                         1938, 4),
+(11, '9788520925548', 'São Bernardo',                        1934, 4),
+(12, '9788535928563', 'Alguma Poesia',                       1930, 1),
+(13, '9788535928570', 'Sentimento do Mundo',                  1940, 1),
+(14, '9789723828123', 'Ensaio sobre a Cegueira',              1995, 6),
+(15, '9789723828130', 'O Evangelho Segundo Jesus Cristo',     1991, 6),
+(16, '9788535928594', 'Mensagem',                             1934, 6),
+(17, '9788535928600', 'Cem Anos de Solidão',                  1967, 1),
+(18, '9780451524935', '1984',                                 1949, 8),
+(19, '9788532530781', 'Harry Potter e a Pedra Filosofal',     1997, 3),
+(20, '9788532530798', 'Harry Potter e a Câmara Secreta',      1998, 3),
+(21, '9788525050641', 'Sapiens',                              2011, 1),
+(22, '9788535914849', 'Homo Deus',                            2015, 1),
+(23, '9788535914856', 'O Nome da Rosa',                       1980, 7),
+(24, '9788535914863', 'O Pêndulo de Foucault',                1988, 7),
+(25, '9788535914870', 'Literatura e Memória',                  2019, 8);
+
+
+-- ============================================================
+-- AUTORIA
+-- ============================================================
+
+INSERT INTO autoria (fkAutor, fkLivro, ordem) VALUES
+
+-- Machado de Assis
+(1, 1,  1),
+(1, 2,  1),
+(1, 3,  1),
+
+-- Clarice Lispector
+(2, 4,  1),
+(2, 5,  1),
+(2, 6,  1),
+
+-- Jorge Amado
+(3, 7,  1),
+(3, 8,  1),
+(3, 9,  1),
+
+-- Graciliano Ramos
+(4, 10, 1),
+(4, 11, 1),
+
+-- Carlos Drummond
+(5, 12, 1),
+(5, 13, 1),
+
+-- José Saramago
+(6, 14, 1),
+(6, 15, 1),
+
+-- Fernando Pessoa
+(7, 16, 1),
+
+-- Gabriel García Márquez
+(8, 17, 1),
+
+-- George Orwell
+(9, 18, 1),
+
+-- J. K. Rowling
+(10, 19, 1),
+(10, 20, 1),
+
+-- Yuval Noah Harari
+(11, 21, 1),
+(11, 22, 1),
+
+-- Umberto Eco
+(12, 23, 1),
+(12, 24, 1),
+
+-- Livro com dois autores
+(2, 25, 1),
+(5, 25, 2);
+
+
+-- ============================================================
+-- EXEMPLARES
+-- ============================================================
+
+INSERT INTO exemplar
+    (codigo, fkLivro, disponivel, numTombo)
+VALUES
+
+(1,  1,  1, 'T000001'),
+(2,  1,  0, 'T000002'),
+(3,  1,  1, 'T000003'),
+
+(4,  2,  1, 'T000004'),
+(5,  2,  0, 'T000005'),
+
+(6,  3,  1, 'T000006'),
+(7,  3,  1, 'T000007'),
+
+(8,  4,  0, 'T000008'),
+(9,  4,  1, 'T000009'),
+
+(10, 5,  1, 'T000010'),
+(11, 5,  0, 'T000011'),
+
+(12, 6,  1, 'T000012'),
+
+(13, 7,  0, 'T000013'),
+(14, 7,  1, 'T000014'),
+(15, 7,  1, 'T000015'),
+
+(16, 8,  1, 'T000016'),
+(17, 8,  0, 'T000017'),
+
+(18, 9,  1, 'T000018'),
+(19, 9,  1, 'T000019'),
+
+(20, 10, 0, 'T000020'),
+(21, 10, 1, 'T000021'),
+
+(22, 11, 1, 'T000022'),
+
+(23, 12, 0, 'T000023'),
+(24, 12, 1, 'T000024'),
+
+(25, 13, 1, 'T000025'),
+
+(26, 14, 0, 'T000026'),
+(27, 14, 1, 'T000027'),
+
+(28, 15, 1, 'T000028'),
+
+(29, 16, 1, 'T000029'),
+
+(30, 17, 0, 'T000030'),
+(31, 17, 1, 'T000031'),
+
+(32, 18, 0, 'T000032'),
+(33, 18, 1, 'T000033'),
+
+(34, 19, 0, 'T000034'),
+(35, 19, 1, 'T000035'),
+
+(36, 20, 1, 'T000036'),
+
+(37, 21, 0, 'T000037'),
+(38, 21, 1, 'T000038'),
+
+(39, 22, 1, 'T000039'),
+
+(40, 23, 0, 'T000040'),
+(41, 23, 1, 'T000041'),
+
+(42, 24, 1, 'T000042'),
+
+(43, 25, 1, 'T000043');
+
+
+-- ============================================================
+-- MEMBROS
+-- ============================================================
+
+INSERT INTO membro
+    (codigo, matricula, fkTipoMembro)
+VALUES
+(1,  '20260001', 1),
+(2,  '20260002', 1),
+(3,  '20260003', 1),
+(4,  '20260004', 1),
+(5,  '20260005', 1),
+(6,  '20260006', 1),
+(7,  '20260007', 1),
+(8,  '20260008', 1),
+
+(9,  'PROF001', 2),
+(10, 'PROF002', 2),
+(11, 'PROF003', 2),
+(12, 'PROF004', 2),
+
+(13, 'FUNC001', 3),
+(14, 'FUNC002', 3),
+(15, 'FUNC003', 3),
+
+(16, 'COM001', 4),
+(17, 'COM002', 4),
+(18, 'COM003', 4),
+(19, 'COM004', 4),
+(20, 'COM005', 4);
+
+
+-- ============================================================
+-- EMPRÉSTIMOS
+-- ============================================================
+
+INSERT INTO emprestimo
+    (numero, fkExemplar, fkMembro, data_retirada, data_devolucao)
+VALUES
+
+(1,  2,  1,  '2026-08-01', '2026-08-10'),
+(2,  5,  2,  '2026-08-02', '2026-08-12'),
+(3,  8,  3,  '2026-08-03', '2026-08-15'),
+(4,  11, 4,  '2026-08-04', '2026-08-14'),
+(5,  13, 5,  '2026-08-05', '2026-08-20'),
+
+(6,  17, 6,  '2026-08-06', '2026-08-16'),
+(7,  20, 7,  '2026-08-07', '2026-08-18'),
+(8,  23, 8,  '2026-08-08', '2026-08-22'),
+(9,  26, 9,  '2026-08-09', '2026-08-19'),
+(10, 30, 10, '2026-08-10', '2026-08-25'),
+
+(11, 32, 11, '2026-08-11', '2026-08-21'),
+(12, 34, 12, '2026-08-12', '2026-08-23'),
+(13, 37, 1,  '2026-08-13', '2026-08-27'),
+(14, 40, 2,  '2026-08-14', '2026-08-28'),
+(15, 2,  3,  '2026-08-15', '2026-08-25'),
+
+(16, 5,  4,  '2026-08-16', '2026-08-30'),
+(17, 8,  5,  '2026-08-17', NULL),
+(18, 11, 6,  '2026-08-18', NULL),
+(19, 13, 7,  '2026-08-19', NULL),
+(20, 17, 8,  '2026-08-20', NULL),
+
+(21, 20, 9,  '2026-08-21', NULL),
+(22, 23, 10, '2026-08-22', NULL),
+(23, 26, 11, '2026-08-23', NULL),
+(24, 30, 12, '2026-08-24', NULL),
+(25, 32, 13, '2026-08-25', NULL),
+
+(26, 34, 14, '2026-08-26', NULL),
+(27, 37, 15, '2026-08-27', NULL),
+(28, 40, 16, '2026-08-28', NULL),
+(29, 2,  17, '2026-08-29', NULL),
+(30, 5,  18, '2026-08-30', NULL),
+
+(31, 8,  19, '2026-09-01', NULL),
+(32, 11, 20, '2026-09-02', NULL),
+(33, 13, 1,  '2026-09-03', '2026-09-10'),
+(34, 17, 2,  '2026-09-04', '2026-09-12'),
+(35, 20, 3,  '2026-09-05', '2026-09-15'),
+
+(36, 23, 4,  '2026-09-06', '2026-09-16'),
+(37, 26, 5,  '2026-09-07', '2026-09-17'),
+(38, 30, 6,  '2026-09-08', NULL),
+(39, 32, 7,  '2026-09-09', NULL),
+(40, 34, 8,  '2026-09-10', NULL);
+
+
+-- ============================================================
+-- 5. CONFERÊNCIA DOS DADOS
+-- ============================================================
+
+SELECT 'autor' AS tabela, COUNT(*) AS quantidade
+FROM autor
+
+UNION ALL
+
+SELECT 'editora', COUNT(*)
+FROM editora
+
+UNION ALL
+
+SELECT 'tipo_membro', COUNT(*)
+FROM tipo_membro
+
+UNION ALL
+
+SELECT 'livro', COUNT(*)
+FROM livro
+
+UNION ALL
+
+SELECT 'autoria', COUNT(*)
+FROM autoria
+
+UNION ALL
+
+SELECT 'exemplar', COUNT(*)
+FROM exemplar
+
+UNION ALL
+
+SELECT 'membro', COUNT(*)
+FROM membro
+
+UNION ALL
+
+SELECT 'emprestimo', COUNT(*)
+FROM emprestimo;
