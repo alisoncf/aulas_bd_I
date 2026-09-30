@@ -1,0 +1,30 @@
+INSERT INTO editora(nomeEditora)VALUES('Editora Vozes');
+ 
+insert INTO livro(isbn,titulo, ano, fkeditora)
+VALUES('8503012345','Poemas dos Becos de Goiás',1965,1);
+
+INSERT INTO editora(nomeEditora)VALUES('Editora Brasil');
+
+
+
+INSERT INTO autor (nome, nacionalidade)VALUES
+('Cora Coralina', 'Brasileira'),
+('Bernardo Élis',  'Brasileira'),
+('José Saramago',  'Portuguesa');
+
+INSERT INTO autor (nome, nacionalidade)VALUES('Machado de Assis', 'Brasileira');
+
+
+
+
+UPDATE livro SET 
+titulo='Poema dos Becos em Goiás',
+ano=1965,
+fkEditora=2
+WHERE
+codigo=2;
+
+
+DELETE FROM autor WHERE codigo=4
+
+DELETE FROM editora WHERE codEditora=2;
