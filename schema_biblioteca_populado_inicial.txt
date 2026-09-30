@@ -1,0 +1,32 @@
+-- Dados de exemplo para a aula de DQL (banco biblioteca, MariaDB)
+-- Rode depois do script DDL. Ordem respeita as FKs (pai antes do filho).
+USE biblioteca;
+
+INSERT INTO editora (codEditora, nomeEditora) VALUES
+  (1,'José Olympio'),(2,'Companhia das Letras'),(3,'Editora UFG'),(4,'Kelps');
+INSERT INTO autor (codigo, nome, nacionalidade) VALUES
+  (1,'Cora Coralina','Brasileira'),(2,'Bernardo Élis','Brasileira'),
+  (3,'José Saramago','Portuguesa'),(4,'Hugo de Carvalho Ramos','Brasileira'),
+  (5,'Mia Couto','Moçambicana');
+INSERT INTO livro (codigo, ISBN, titulo, ano, fkEditora) VALUES
+  (1,'8503012345','Poemas dos Becos de Goiás',1965,1),
+  (2,'8503054321','O Tronco',1956,1),
+  (3,'8571644950','Ensaio sobre a Cegueira',1995,2),
+  (4,NULL,'Tropas e Boiadas',1917,3),
+  (5,'8572740123','Vintém de Cobre',1983,3),
+  (6,'8571642400','O Evangelho segundo Jesus Cristo',1991,2);
+INSERT INTO autoria (fkAutor, fkLivro, ordem) VALUES
+  (1,1,1),(2,2,1),(3,3,1),(4,4,1),(1,5,1),(3,6,1);
+INSERT INTO exemplar (codigo, fkLivro, disponivel, numTombo) VALUES
+  (1,1,0,'T-0001'),(2,1,1,'T-0002'),(3,2,0,'T-0003'),
+  (4,3,1,'T-0004'),(5,4,1,'T-0005'),(6,5,0,'T-0006');
+INSERT INTO tipo_membro (codigo, descricao) VALUES
+  (1,'Aluno'),(2,'Professor'),(3,'Servidor');
+INSERT INTO membro (codigo, matricula, fkTipoMembro) VALUES
+  (1,'2023001',1),(2,'2023002',1),(3,'P0101',2),(4,'S0050',3);
+INSERT INTO emprestimo (numero, fkExemplar, fkMembro, data_retirada, data_devolucao) VALUES
+  (1,1,1,'2026-09-01',NULL),
+  (2,3,3,'2026-09-05',NULL),
+  (3,4,2,'2026-08-10','2026-08-20'),
+  (4,6,1,'2026-09-15',NULL),
+  (5,2,3,'2026-07-01','2026-07-12');
