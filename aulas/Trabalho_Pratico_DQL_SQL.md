@@ -1,3 +1,4 @@
+
 # Trabalho Prático — DQL em SQL
 
 **Disciplina:** Banco de Dados  
@@ -5,6 +6,8 @@
 **SGBD:** MariaDB
 
 ## Orientações
+
+Crie os banco utilizando os scrtips populados (biblioteca e clínica).
 
 Resolva os exercícios utilizando comandos de consulta SQL (DQL).
 
